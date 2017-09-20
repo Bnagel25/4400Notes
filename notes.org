@@ -1,0 +1,1458 @@
+ #+TODO: TODO STUDY | COMPLETED
+#+LaTeX_CLASS_OPTIONS: [10pt]
+* https://www.eng.utah.edu/~cs4400
+* Table of Contents
+** [[Monday August 21]]
+** [[Wednesday August 23]]
+** [[Monday August 28]]
+** [[Wednesday August 30]]
+** [[Wednesday September 6]]
+** [[Monday September 11]]
+** [[Wednesday September 13]]
+** [[Monday September 18]]
+** [[Wednesday September 20]]
+* Monday August 21
+** Video Lectures
+   Video Lecture are due 1 hour before class on Monday and Wednesday
+   
+** In Class
+   https://www.eng.utah.edu/~cs4400
+   Labs are based on homework problems.
+   Classes are based on video lectures. Each video lecture  
+   
+*** Terminal Commands
+   Each terminal command looks for /bin/ directory which is editable by its PATH   
+   + ls = list directory
+   + cat = concatonate
+   + echo = takes arguments as things to echo back to you
+   + use \ to get use escape characters as literals
+   + man = manual page
+
+     
+* Wednesday August 23
+
+** Video Lectures
+   [[https://www.eng.utah.edu/~cs4400/c+presentation.pdf][Slides]]
+
+*** Compiling and running
+    gcc x.c
+    ./x
+    gcc -o x x.c
+    ./x
+    
+    any non-0 result reports a failure
+    
+*** Enabling Warnings
+    gcc -Wall x.c to enable warnings
+
+*** Printing a number
+    #+begin_src C
+    int main() {
+        printf("Ten + Ten = %d\n", 20);
+    }
+    #+end_src
+    - %d = int
+    - %f = double
+    - %s = string
+    - %p = address
+    - %c = char
+
+*** Variables Live in memory / Pointers
+    & as an operator means "The Address of"-- a pointer
+
+    * in a type means "the address of a"
+    * as an operator means "value at the address"
+    
+    #+begin_src C
+    int main() {
+        int v = 5;
+        int* p = &v;
+    
+        v = 6;
+        printf("At %p is %d\n", p, *p) 
+        return 0;
+    }
+    #+end_src
+
+*** Changing Memory can change variables
+    #+begin_src C
+    int main() {
+        int v = 5;
+        int* p = &v;
+    
+        *p = 7
+        printf("At %p is %d\n", p, *p) //  7
+        return 0;
+    }
+    #+end_src
+
+*** Array Notation
+   #+begin_src C
+    int main() {
+        int a[3] = {1, 2, 3};
+        int* p = a;
+    
+        printf("%d %d %d\n", a[0], p[1] *(p + 2)) //  output == 1 2 3
+        return 0;
+    }
+    #+end_src
+   you can assign p = %a, it will implicitly be a pointer value
+
+*** Pointer Arithmatic
+    Each box in a machines memory holds a number bewteen -127 and 127
+    - char = 1
+    - short = 2
+    - int = 4
+    - long = 8
+    - address = 8
+*** Computing Sizes
+    Use the sizeof() operator
+*** Allocation
+    use malloc(100 * sizeof(int)) to allocate space for 100 ints
+*** Logical Operations
+    C doesnt distinguish booleans from numbers
+    - 0 counts as false
+    - any other value counts as true
+*** Characters and Strings
+    A string like "apple" is represented as a sequence of bytes terminated with a 0 byte
+    97     112    112    108    101    0
+    a       p      p      l      e     
+    char* = 8 bytes = the address of many bytes
+* Monday August 28
+** Video Lectures
+   [[https://www.eng.utah.edu/~cs4400/machine-model.pdf][Slides]]
+*** Assembly and machine code
+    Machine model in descending order
+    + Java Virtual Machine
+    + C
+    + Operating System
+    + Memory Hierarchy
+    + Instruction Set Archetecture
+    + Microarchetecture
+    + Hardware
+*** History
+    x86 and x86 64 are the ISA's for desktop and server
+    arm is for mobile devices
+    x86 is part of a complex instruction set
+    + Directly provide common operations
+    + Mixed instruction sizes common things are compack
+    
+    x86 in a RISC wrapped with a CISC archetecture
+*** Machine Model
+    %rip = instruction pointer (memory location of next instruction)
+    memory sends over addresses to get back memory or instructions
+    Instruction categories
+    + Arithmetic: perform arithmetic on register or memory
+    + Data: transfer data between memory and registers
+    + Control: make program counter jump
+*** Compile, assemble, disassemble
+    gcc -Og p1.c p2.c -lc -o p
+       C: p1.c and p2.c (text)
+          compile gcc -Og -S
+       Assembly: p1.s and p2.s (text)
+          assembler gcc or as
+       Object: p1.o and p2.o & Library: libc.a (binary)
+          linker gcc or ld
+       Executable: p (binary)
+*** Operand and register sizes
+    An assembly instruction suffix indicates the size of the operand
+       "movq" moves a "quad" word
+    + b 'byte'= 8 bits = char
+    + w 'word' = 16 bits = short
+    + l 'long word' = 32 bits = int
+    + q 'quad word' = 64 bits = long
+    Floating Point Operations
+    + s 'single precision' = 32 bits = float
+    + l 'double precision' = 64 bits = double
+*** Operand Examples
+    M[addr] = the value stored at addr in memory
+    R[reg] = value stored in the register named reg
+    + %eax --> register --> R[%eax]
+    + $0x2a3 --> literal --> 0x2a3
+    + (%eax) --> indirect --> M[R[%eax]] (get the value of the memory addr)
+    + 7(%eax) --> base + displacement --> M[7 + R[%eax]]
+*** Move Instructions
+    Copying Data
+       movx source, dest
+    Stack shortcuts
+       pushx source
+       popx dest
+    Combines an adjustment of %rsp witha copy to/from memory it points to
+*** Arithmetic Instructions
+    addx, subx, imulx, salx, sarx, shlx, shrx, xorx, andx, orx
+*** Reading ISA Manuals
+    AMD64 General Purpose Instructions for instruction information
+** In Class
+*** Decompile Problem #1
+   #+begin_src asm
+   mystery:
+      movl (%rdi), %eax   ; temp = *p1
+      movl (%rsi), %edx,  ; temp2 = p2
+      movl %edx, (%rdi)   ; *p2 = temp
+      movl %eax, (%rsi)   ;*p1 = temp2
+   #+end_src
+   Corresponds to
+ #+begin_src C
+ void swap(int* a, int* b)
+{
+  int temp = a;
+  a* = *b;
+  *b = temp;
+}
+ #+end_src
+
+*** Decompile Problem #2
+    Before
+    + CPU
+      - rax = 0
+      - rdi = 0x200
+    + Mem
+      - 0x200 = 'C'
+      - 0x201 = 'S'
+      - 0x202 = ''
+      - 0x203 = '4'
+      - 0x204 = '4'
+      - 0x205 = '0'
+      - 0x206 = '0'
+      - 0x207 = '\0'
+
+    After
+    + CPU
+      - rax = 4
+      - rdi = 0x200
+    + Mem
+      - 0x200 = 'S'
+      - 0x201 = ''
+      - 0x202 = '4'
+      - 0x203 = '4'
+      - 0x204 = '4'
+      - 0x205 = '0'
+      - 0x206 = '0'
+      - 0x207 = '\0'
+  z means to fill all above bits with 0's
+    #+begin_src asm
+    mystery:
+       movzbl 1(%rdi), %eax   ; *str = *(str + 1)
+       movb %al, (%rdi)
+       mozbl 2(%rdi), %eax   ; modifiy pointer +2 then reference
+       movb %al, 1(%rdi)
+       movzbl 3(%rid), %eax
+       movb %al, 2(%rdi)
+    #+end_src
+
+    #+begin_src C
+    void cascade(char* str){
+       *str = *(str + 1);
+       str++;
+       *str = *(str + 1);
+       str++;
+       *str = *(str + 1);
+    }
+    #+end_src
+
+*** Decompile Problem #3 
+
+    #+begin_src C
+    int foo(long x, int y, char c, int* p);
+    int main() {
+       foo(1,2,3,4);
+       return 0;
+    }
+    #+end_src
+    gcc main.c will not compile due to undefined reference to foo
+    
+    gcc is not just the compilier, it is the assembler, pre-processor, linker and assembler
+
+    gcc main.c -S will generate main.s (assembly text file)
+    gcc main.c -c will generate main.o (machine code / object file)
+    objdump main.o will interpret the object file binary
+
+    #+begin_src C
+    int foo(long x, int y, char c, int* p)   {
+       return 0;
+    }
+    #+end_src
+    gcc can take it on faith that both of these are eventually going to be met up with each other
+    gcc will set a flag in the assembly code that says to go out and look for a new argument.
+    The parameters are sent in using designated register. This is called a calling convention
+
+    #+begin_src asm
+    main:
+       movl $4, %ecx
+       movl $3, %edx
+       movl $22, %esi
+       movl $99, %edi
+       call foo
+       movl $0, %eax
+    #+end_src
+
+    So lets figure out what foo is supposed to do from foo.s
+    #+begin_src asm
+    foo:
+       leal(%rsi, %rdi), %eax   ; (%rsi, %rdi) == %rsi + %rdi
+       ret
+    #+end_src
+
+    This corresponds to
+    #+begin_src C
+    int foo(long x, int y, char c, int* p){
+       return y + x;
+    }
+    #+end_src
+
+*** Decompile Problem #4
+
+
+    #+begin_src asm
+    f:
+       movq %rdi, %rax  ; long temp
+       movl %edx, %ecx  ; char temp2
+       salq %cl, %rax   ; cl --> one byte version of ecx, so return temp <<= temp2
+    #+end_src
+    Corresponds to:
+    #+begin_src C
+    int f(long x, int y, char z, int *p){
+       long temp = x;
+       char temp2 = z;
+
+       temp <<= temp2;
+       return temp;
+    }
+    #+end_src
+    We are using char as a representation of a byte, not for purposes of using ascii.
+
+*** Decompile Example #5
+    #+begin_src asm
+    f:
+        subl %esi, %edi  ; subtract 1st arg with 2nd arg 
+        movsbl %dl, %edx ; L in assembly does not correspond to long in C
+        movl %edi, %eax  ; move 1st arg to return register
+        imull %edx, %eax ; multiply
+    #+end_src
+    Corresponds to
+    #+begin_src C
+    int f(long x, int y, char z, int* p) {
+       x = x - y;
+       int temp = (int) z;
+       int ret_val = x;
+       return temp * ret_val
+    }
+    #+end_src
+
+*** Decompile Example #6
+    #+begin_src asm
+    f:
+       leal (%rsi, %rdi), %eax  ; add 1 arg and 2 arg into ret reg
+       movl %eax, (%rcx)  ; we know eax == 32 bits, so dereference rcx
+    #+end_src
+    Corresponds to
+    #+begin_src C
+    int f(long x, int y, char z, int* p) {
+       int temp = x + y;
+       return *temp;
+    }
+    #+end_src
+
+* Wednesday August 30
+** Video Slides
+*** Condition Codes
+    + CF carry- carry out most significant bit
+    + ZF zero - produced zero
+    + SF sign -produced negative
+    + OF overflow - produced two's complement overflow
+*** Interpreting Condition Codes
+    subl source, dest
+    + dest == source --> ZF
+    + dest != source --> !ZF
+    Unsigned
+    + dest < source --> CF
+    + dest <= source --> CF | ZF
+    Signed
+    + dest < source --> SF^OF
+    + dest <= source (SF ^ OF) | ZF
+*** Setcc, cmpx, testx
+    setcc dest --> sets one byte in dest to 0 or 1
+    + sete --> ZF
+    + setne --> !ZR
+    + sets --> SF
+    + setg --> !(SF ^ OF) & ~ZF
+    + setge --> !(SF ^ OF)
+    + setl --> (SF ^ OF)
+    + setle --> (SF ^ OF) | ZF
+    + seta --> !CF & !ZF
+    + setb --> CF
+*** cmovccx
+    cmovccx source, dest (where x is the size)
+    cmovccx which is like mov but only if the condition codes imply xx
+*** Jumps via jcc and jmp
+    jcc source
+    + je- equal / zero
+    + jne- not equal / not zero
+    + js- negative
+    + jg- greater signed
+    + jl- less signed
+    + ja- above unsigned
+    + jb- below unsigned
+    Uncondinditional Jump
+       jmp source
+*** do-while loops
+    #+begin_src C
+    do {
+       body;
+    }
+    while (test);
+    #+end_src
+    corresponds to intermediary C code as:
+    #+begin_src asm
+    loop:
+       body
+       if (test)
+          goto loop;
+    #+end_src
+*** while loops
+    #+begin_src C
+    while(test) {
+       body;
+    }
+    #+end_src
+    corresponds to intermediary C code as:
+   #+begin_src asm
+    loop:
+       if (!test)
+          goto done;
+       body
+       goto loop;
+    done:
+    #+end_src
+*** for loops
+    #+begin_src C
+    for(init; test; update) {
+       body;
+    }
+    #+end_src
+    corresponds to intermediary C code as:
+    #+begin_src asm
+        init
+    loop:
+       for(!test)
+          goto done;
+       body
+       update
+       goto loop;
+    done:
+    #+end_src
+*** Switch and jump tables
+     #+begin_src C
+    switch (x) {
+    case 1:
+       one
+       break;
+    case 2:
+       two
+    case 3:
+       two-and-three
+    }
+    #+end_src
+    corresponds to intermediary C code as:
+    #+begin_src asm
+    if (x == 1)
+       goto one;
+    else if (x == 2)
+       goto two;
+    else if (x == 3)
+       goto three;
+    else
+       goto done;
+    one: 
+       one
+       goto done;
+    two:
+       two
+    three:
+       two-and-three
+    done;
+    #+end_src
+** In Class
+*** Assembly Code to fill in the blanks
+    #+begin_src C
+    char ctest(long a, long b, long c) {
+        char t1 = a > b;
+        char t2 = (int) b < (int) a;
+        char t3 = (unsigned) c >= (unsigned) a;
+        char t4 = a != c;
+        char t5 = (unsigned char) c > (unsigned char) b
+        char t6 = a != 0;
+    }
+    #+end_src
+    Corresponds to:
+    #+begin_src asm
+    cmp1 %rsi, %rdi ; %rdi = a, %rsi = b
+    setg %r10b 
+                                 ; a > b
+    cmpl %edi, %esi ; a and b but different sizes, compare longs
+    setnb %r9b
+                                 ; (int) b < (int) a
+    cmpl %edi, %edx ; edi = a, edx = c
+    setnb %r9b ; set not below unsigned >=
+                                 ; (unsigned) c >= (unsgined) a
+    cmpq %rdx, %rdi ; rdx = c, rdi = a
+    setne %r8b
+                                 ; a != c
+    cmpb %sil, %dt ; dl = c, sil = b
+    seta %cl
+                                 ; (unsigned char) c > (unsigned char) b
+    testq %rdi, %rdi ; rdi = a, test means &, means 0 or not 0
+    setne %dl
+                                 ; a != 0;
+    #+end_src
+*** Conditional Excerice
+    Check online quiz
+*** Loop Excercise with Goto's and Labels
+    #+begin_src C
+    /*
+      Implement sum() to sum an array of integers
+      - using goto and labels
+      - without using loops (for, do-while, while)
+      - with only one-armed if's
+      - with only goto in the 'then' part of if
+    */
+    int sum(int *a, int len) {
+        int index = 0;
+        int result = 0;
+        
+        loop:
+            if (index >= len) 
+               goto done;
+        
+            result = a[index] + a[index + 1];
+            index++;
+            goto loop;
+
+       done: 
+            return result;
+    }
+    #+end_src
+*** Loop Excerise with Goto's and Labels w/ Only odd numbers
+        #+begin_src C
+    /*
+      Implement sum() to sum an array of integers
+      - using goto and labels
+      - only sum the odd numbers
+      - without using loops (for, do-while, while)
+      - with only one-armed if's
+      - with only goto in the 'then' part of if
+    */
+    int sum(int *a, int len) {
+        int index = 0;
+        int result = 0;
+        
+        loop:
+            if (index >= len) 
+                goto done;
+            
+            if (!(a[index] & 1)
+                goto increment;
+            
+            goto sum;
+       sum:
+            result += a[index];
+       
+       increment:
+            index++;
+            goto loop;
+
+       done: 
+            return result;
+    }
+    #+end_src
+* Wednesday September 6
+** Video Slides
+*** Procedures
+**** Passing Control
+    + to called procedure
+    + back to caller
+**** Passing data
+    + procedure arguments
+    + procedure result
+**** Memory allocation
+    + local variables
+    + continuation
+*** C Stack
+   Pop moves up
+   Push grows down
+   
+   %rsp is the stack pointer
+   
+   Stack frames support recursion
+**** Call and Ret
+    Caller puts return address on the stack
+    Callee pops return address off the stack
+    
+    callx source
+    Combines two actions:
+    pushes next value of %rip and then jmps to source
+
+    retx
+    pops value %rip,
+**** Procedure Arguments and Results
+    First six arguments
+    + %rdi = 1st argument
+    + %rsi = 2nd argument
+    + %rdx = 3rd argument
+    + %rcx = 4th argument
+    + %r8 = 5th argument
+    + %r9 = 6tht argument
+
+    Return value
+    + %rax
+    #+begin_src C
+    long mult2(long a, long b) {
+        long s = a * b;
+        return s;
+    }
+    #+end_src
+    Corresponds to
+    #+begin_src asm
+    mov %rdi, %rax    ; a
+    mov %rsi, %rax    ; a * b
+    retq              ; Return
+    #+end_src
+**** Preserved and temporary registers
+    #+begin_src C
+    void multstore(long x, long y, long *dest) {
+        long t = mult2(x, y);
+        *dest = t;
+    }
+    #+end_src
+    Corresponds to:
+    #+begin_src asm
+    pushq %rbx          ; save %rbx
+    mov %rdx, %rbx      ; save dest
+    callq <mult2>       ; mult2(x, y)
+    movq %rax, (%rbx)   ; Save at dest
+    popq %rbx           ; Restore %rbx
+    retq
+    #+end_src
+    This is because rbx is a preserved register
+    Classicfiactions of registers is in the ABI
+**** Temporaries
+    call a function --> register value may change on return
+    aka caller saved
+    + %rax
+    + %rdi
+    + %rsi
+    + %rdx
+    + %rcx
+    + %r8
+    + %r9
+    + r10
+    + r11
+**** Preserved
+    call a function --> register value the same on return
+    aka callee saved
+    + %rbx
+    + %r12
+    + %r13
+    + %r14
+    + %rbp
+    + %rsp
+**** Application Binary Interface
+    An OS-specific ABI defines
+    + How arguments are passed to functions
+    + How results are returned from functions
+    + Which registers are preserved
+    + Stack Alignment
+*** Debugging Stack frames
+   gcc -g allows for more information about stackframes
+   use 'backtrace' to see stack information
+
+   gcc -fno-asynchronous-unwind-tables for absolutley no debugging information
+
+   gcc -fno-asynchronous-unwind-tables -fno-omit-frame-pointer for useful debugging information but
+   in a different way
+*** Frame pointer
+   Stack frames are optionally identified by a frame pointer (%rbp)
+   + Frames form a linked list embedded in the stack
+   + Each functions prolog sets up the frame
+   + Each function's epilog destroys the frame
+   + %rbp points to the head of the list (i.e the current frame)
+     - Local variables are refrenced from %rbp
+
+   Using a Frame Pointer
+   + Prolog
+     - pushq %rbp
+     - movq %rsp, %rbp
+   + Epilog
+     - popq %rbp
+     - retq 
+* Monday September 11
+** Video Slides
+*** Arrays and Pointers
+    #+begin_src C
+    int A[4] = {1, 3, 8, 9};
+    #+end_src
+
+    if A is at addres 0x400-
+    0x400    0x404    0x408   0x40c
+    1          3        8       9
+
+    A == (int *) 0x400;
+    A[1] == 3
+    *(A + 1) == 3
+    A + 1 == (int *) 0x404
+    *(int *)0x404 == 3
+    
+    Pointer Arithmetic
+    + OK to add an int to a pointer
+    + OK to subtract an integer from a pointer
+    + OK to subtract a pointer from a pointer
+    + NOT OK to add pointer to a pointer
+*** Arrays as Arguments
+    Given A[4]
+    or
+    int *A = malloc(sizeof(int) * 4)
+    then A mostly behaves the same either way
+    
+    int A[4]: &A is the same as int * as A
+    int *A: &A is int**
+
+    
+    void f(int v[1])
+       is the same as
+    void f(int v[100])
+    void f(int v[])
+    void f(int *v)
+    
+    because C is a call by value language and the arr v is a value of 
+    the pointer to v;
+    #+begin_src C
+    void f(int *v) {
+        v[0] = 2;
+    }
+    void call_f() {
+        int *p = malloc(sizeof(int));
+        *p = 1;
+        f(p);
+        printf("%d\n", *p);
+    }
+    /* Returns 2 since C is call by value, and p is an address value */
+    #+end_src
+*** Typdef
+    A type defintion looks like a variable definition but prefixed with typedef
+    
+    int v;
+       defines v to hold an int value
+    int *p;
+       defines p to hold an int value
+    
+    typedef int T;
+       defines T as an alias for int
+    typedef int *T;
+       defines T as an alias for int*
+
+*** Two-Dimensional Array Layout
+    int A[M][N];
+    
+    Memory
+         A[0][0] A[0][1]
+         A[1][0] A[1][1]
+    Memory Linear
+         A[0][0] A[0][1] A[1][0] A[1][1]
+         
+    This is row major
+    
+    So for A[i][j] = 17;
+    int *p = (int *)A;
+    *p[i * N + j] = 17;
+
+** In Class
+*** Example 1 
+   #+begin_src C
+   /*
+   sums the elements along the diagonal of a square 2-d matrix
+   'ap' points to the start of the matrix, and n is the length & width
+   */
+   int sum_diagonal(int *ap, int n) {
+      int sum = 0;
+      int count = 0;
+
+      for(i = 0; i < n; i++) {
+          sum = sum + *(ap + (i * n + i)); 
+      }
+   }
+   #+end_src
+*** Example 2
+     #+begin_src C
+     /*
+     Sums the elements among the diagnoal of a square 2-dimensional matrix, but the 
+     matrix is represented by a 1-d array of pointers to a 1-d array of rows
+     */
+     int sum_diagonal(int **rows, int n) {
+         int sum = 0;
+         int i;
+         for(i = 0; i < n; i++) {
+             sum += *(*(rows + i) + i);
+         }
+         return sum;
+     }
+     /*
+     rows = 
+          [*] [*] [*]
+                   ---> [7][8][9]
+               -->[4][5][6]
+          -->[1][2][3]
+     */
+     #+end_src
+*** Reverse engineer assembly for 2-d (Midterm)
+     #+begin_src C
+     int mat1[M][N];
+     int mat2[N][M];
+
+     int check(int i, int j) {
+         return mat1[i][j] & mat2[i][j];
+     }
+     #+end_src
+     Corresponds to :
+     #+begin_src asm
+     check:
+          movslq %esi, %rsi           ; Moving 1st arg to long (j)
+          movslq %edi, %rdi           ; Moving 2nd arg to long (i)
+          leaq (%rdi, %rsi, 8), %rdx  ; rdx = 8 * (i) + i = 9i
+          addq %rsi, %rdx             ; rdx += j,
+          leaq(%rdi, %rdi, 2), %rax   ; rax = 2 * i + i
+          addq %rax, %rsi             ; rsi += 3i
+          movl mat2(, %rsi, 4), %eax  ; eax = mat2[3i + j] (4 is the sizeof(int))
+          andl mat1(, %rdx. 4), %eax  ; eax &= mat1[9i + j] (4 is the sizeof(int))
+          ret
+     ; So we can see that M = 3, N = 9
+     #+end_src
+*** Make 2d array
+     #+begin_src C
+     /* Makes a 2-d array of n starting from 1 and counting up */
+     int *make_2d_array(int n) {
+         /* Returning test as int test[n][m] is no good, because a local
+          'test' array goes away when the function returns.
+          We have to use malloc()
+         */
+         // int test[n][m];
+         int *test = malloc(sizeof(int) * n * n);
+         int i;
+         
+         for(i = 0; i < n * n;  i++) {
+             *(test + i) = i + 1;
+           
+         }
+         return test;
+     }
+     
+     int main() {
+         printf("%d\n", sum_diagonal(make_2d_array(3), 3));
+     }
+     #+end_src
+* Wednesday September 13
+** Video Slides
+*** Declaring Structs
+    #+begin_src C
+    struct element {
+       char name[10];
+       char symbol[10];
+       int atom_no;
+       double mass;
+    };
+    struct element h = {"Hydrogen", "H", 1, 1.00794};
+    #+end_src
+    Common to give a short name with typdef
+        #+begin_src C
+    typedef struct element {
+       char name[10];
+       char symbol[10];
+       int atom_no;
+       double mass;
+    }element;
+    element ELT = {"Hydrogen", "H", 1, 1.00794};
+    #+end_src
+*** Accessing Struct Fields
+    'struct.element' if accessing the struct without a pointer
+    'struct->element' if accessing the struct with a number
+*** Structure layout
+    + A struct has its field's values in order
+    + Aligned on the highest element     
+    #+begin_src C
+    struct element {
+       char name[10];
+       char symbol[10];
+       int atom_no;
+       double mass;
+    };
+    #+end_src
+| 0-10 | 10- 15 | 15- 16    | 16- 20  | 20- 24    | 24- 31 |
+|------+--------+-----------+---------+-----------+--------|
+| name | symbol | (padding) | atom_no | (padding) | mass   |
+*** Linked List Example
+    #+begin_src C
+    struct int_list {
+      int v;
+      struct int_list *next;
+    }
+    #+end_src
+| 0-4 | 4-11 | 0-4 | 4-11 |
+|-----+------+-----+------|
+|   v | next |   v | next |
+*** Unions
+    + A struct is an and of field values
+      #+begin_src C
+      /* A number *and* a string */
+      struct t_shirt {
+         int size;
+         char *color;
+      }
+      #+end_src
+      |  0-4 | 4-8 |  8-15 |
+      |------+-----+-------|
+      | size |     | color |
+    + A union is an or of field values
+      #+begin_src C
+      /* a number *or* a string */
+      union homework_result {
+        int grade;
+        char *excuse;
+      }
+      #+end_src
+      |   0-4 | 4-7 |
+      |-------+-----|
+      | grade |     |
+      OR
+      |    0-7 |
+      |--------|
+      | excuse |
+*** Controlling Struct Alignment
+    #+begin_src C
+    /* select 1-byte alignment for everything */
+    #pragma pack(1)
+    typedef struct step {
+       char mode;
+       double height;
+    } step_t;
+    /* resume default alignments */
+    #pragma pack()
+    #+end_src
+** In Class
+*** Size Example 1
+   #+begin_src C
+   typedef struct fish {
+      int color;
+      char *name;
+   } fish;
+   /*
+   offsetof(fish, color) = 0
+   offsetof(fish, name) = 8
+   sizeof(fish) = 16
+   */
+   typedef struct fish2 {
+     char *name;
+     int color;
+   } fish2;
+   /*
+   offsetof(fish2, color) = 0
+   offsetof(fish2, name) = 8
+   sizeof(fish) = 16
+   */
+   typedef struct int_tree {
+      struct int_tree *left;
+      struct int_tree *right;
+      int val;
+   } int tree;
+      /*
+   offsetof(int_tree, left) = 0
+   offsetof(int_tree, right) = 8
+   offsetof(int_tree, val) = 16
+   sizeof(fish) = 24
+   */
+   #+end_src
+*** Struct Example 2 
+    #+begin_src C
+    typedef struct {
+       int x;
+       int y;
+    } two_ints;
+    
+    typedef struct {
+       long x;
+       long y;
+    } two_longs;
+    
+    typedef union {
+       int x;
+       long y;
+    } int_or_long;
+
+    /* Answer(f (two_longs a, (int_or_long) b, (two_ints/int_or_long) c)) */
+    long f(?? *a, ?? * b, ?? *c) {
+        return a->x + b->y + c->x;
+    }
+    /* Answer(g (int_or_long a, two_longs b, two_ints c) ) */
+    long g(?? *a, ?? * b, ?? *c) {
+        return a->y + b->x + c->y;
+    }
+    #+end_src
+    #+begin_src asm
+    f:
+       mov      (%rdi), %rax  ; rdi = a, rax = *a
+       movslq   (%rdx), %rdx  ; rdx = c rdx = *c (sign extend long)
+       addq     (%rsi), %rax  ; rsi = b, rax = *b (looking at offset 0 for long)
+       addq     %rdx, %rax  
+       ret
+   g:
+      movq     (%rdi), %rax  ; rdi = a, rax = *a
+      movslq   4(%rdx), %rdx ; rdx = c, rdx = 4 + *c (looking for long-word = 4 byte)
+      addq     (%rsi), %rax  ; rsi = b, rax = *b (looking for 8 bytes, at 0 offset) 
+      addq     %rdx, %rax
+    #+end_src
+*** Using Struct example
+    #+begin_src C
+    typedef struct int_list {
+      int val;
+      struct int_list *next;
+    } int_list;
+    
+    int sum_list(int_list *lst) {
+        int sum;
+        
+        sum = 0;
+        if(lst == NULL) {
+           return sum;
+        }
+
+        while(lst->next != NULL) {
+           sum += lst->val;
+           lst = lst->next;
+        }
+        
+        return sum;
+    }
+    
+    int_list *array_to_list(int* a, int len) {
+       
+       int_list *ret_list;
+       int i;
+
+       ret_list = NULL;
+       for(i = len- 1; i >= 0; i--) {
+           
+           int_list *new_node = malloc(sizeof(int_list));
+           new_node->val = a[i];
+           new_node->next = ret_list;
+           ret_list = newNode;           
+       }
+    }
+    
+    int a = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    
+    int main() {
+       printf("%d\n", sum_list(array_to_list(a, 10)));
+       return 0;
+    }
+    #+end_src
+* Monday September 18
+** Video Slides
+*** Optimizing Compiliers
+    + Efficient mapping of program to machine
+      - register allocation
+      - instruction selection and ordering
+      - dead code elimination
+      - eliminating minor inefficiencies
+    + Don't (usually) improve asymptotic efficiency
+      - programmer must use proper alogrithm
+      - non-algorithmic differences can still be significant
+*** Optimizer Limitations
+    + Must not change the behavior of the program (if defined)
+    + Behavior obvious to the programmer can be obfuscated by coding style
+    + Most analysis is perfromed only wihtin a procedure
+    + Analysis is based on static information
+*** Code Motion
+    #+begin_src C
+    /* Without Code Motion */
+    void set_row(double *a, double *b, long i, long n) {
+       long j;
+       for (j = 0; j < n; j++) {
+          a[n* i + j] = b[j];
+       }
+    }
+    /* With Code Motion  */
+    void set_row(double *a, double *b, long i, long n) {
+       long j;
+       int ni = n*i;
+       for (j = 0; j < n; j++) {
+          a[ni + j] = b[j];
+       }
+    }
+    #+end_src
+*** Strength Reduction
+    Replace an operation with a simpler one
+    #+begin_src C
+    /* Without code Motion */
+    int sixteen(int v) {
+       return 16 *v;
+    }
+    /* With code Motion  */
+    int sixteen(int v) {
+       return x << 4;
+    }
+    #+end_src
+*** Common Subexpression elimination
+    + Expression does not need to be calculated everytime if the value isnt expected
+      to change
+    + Like Code Motion but in multiple places
+*** Optimization Blocker
+    1. Procedure Calls
+       - when a call to a different function must be made
+    2. Aliasing
+       - pointer can get confused if two different pointers share an address
+*** Strict Aliasing
+    Strict aliasing means that a compiler can assume that p1 and p2 have different
+    addresses if they're different pointer types.
+*** Strlen
+    Strlen must walk a string to find the 0 terminator.
+    So..
+    #+begin_src C
+    /* Do not write this */
+    for (i = 0; i < strlen(s); i++) {}
+    /* Instead write this */
+    int len = strlen(s);
+    for(i = 0; i < len; i++) {}
+    #+end_src
+** In Class
+*** Class Optimization Example 1
+    #+begin_src C
+    /* Without Code Motion */
+    int f(int *a, int len) {
+       int i, sum = 0;
+       for(i = 1; i < len; i++) {
+           sum += a[i] + a[0];
+       }
+       return sum;
+    }
+    /* With Code Motion */
+    int f(int *a, int len) {
+       int i, sum = 0;
+       int v = a[0];
+       for(i = 1; i < len; i++) {
+          sum += a[i] + v;
+       }
+       return sum;
+    }
+    #+end_src
+*** Class Optimization Example 2
+    #+begin_src C
+    /* Aliasing  */
+    int f(int *a, int b*, int len) {
+       int i, sum = 0;
+       for(i = 1; i < len; i++) {
+          b[i] += a[0];             // Compilier cannot lift a[0] out since a and b might be the same
+       }
+       return sum;
+    }
+    #+end_src
+*** Class Optimization Example 3
+    #+begin_src C
+    /* Without Code Motion */
+    int f(int *a, int len) {
+       int i, sum = 0;
+       for(i = 1; i < len; i++) {
+           sum += a[i - 1] + a[i];
+       }
+       return sum;
+    }
+    /* With Code Motion */
+    int f(int *a, int len) {
+       int i, sum = 0;
+       int temp = a[0];
+       for(i = 1; i < len; i++) {
+          int v = a[i];
+          sum += temp + v;
+          temp = v;
+       }
+       return sum;
+    }
+    #+end_src
+*** Class Optimization Example 4
+    #+begin_src C
+    typedef int(*convert_proc)(int, int); // Pointer to a function
+
+    int f(int *a, int len, convert_proc convert) {
+       int i, sum = 0;
+       for(i = 1; i < len; i++) {
+           sum += convert(a[0], a[i]);    // Cannot pull a[0] because convert might change a
+       }
+       return sum;
+    }
+    #+end_src
+* Wednesday September 20
+** Video Slides
+*** Floating Point on x86-64
+    + float or double args are in %xmm0-%xmm7
+    + float or double result are in %xmm0
+    + %xmm8-%xmm15 are temporaries
+    + Float = 32 bits
+    + Double = 64
+      
+    + Arithmatic Instructions
+      - addsx where x is either s or d (where s is float, d is double)
+      - cvtsx2sx where x is either (s, d, or i for integer)
+        - cvtsi2sdq to convert a long to a double
+*** Vector Operations
+    + SIMD (single instruction multiple data)
+      - requires 16-bit alignment
+      
+    Auto vectorization example
+    #+begin_src C
+    void mult_all(double a[], double b[]) {
+       a[0] = a[0] * b[0];
+    }
+    #+end_src
+*** Superscalar Processors
+    + Issue and execute multiple instructions within a cycle
+    + Instructions are determined dynamically
+      
+    Instruction-level parallelism
+    + Some instructions in a program can execute at once
+    + No explicit declaration is needed
+*** Pipelined Functional Units
+    #+begin_src C
+    long mult(long a, long b, long c ) {
+       long p1 = a*b;
+       long p2 = a*c;
+       long p3 = p1*p2;
+       return p3;
+    }
+    #+end_src
+    Mutliplication takes 3 cycles so... 9 cycles minimum?
+    No, because
+    + one new multiplication can start every cycle
+    + a*b and a*c are independent calculations
+|         | t=1 | t=2 | t=3 | t=4 | t=5   | t=6   | t=7   |
+|---------+-----+-----+-----+-----+-------+-------+-------|
+| stage 1 | a*b | a*c |     |     | p1*p2 |       |       |
+| stage 2 |     | a*b | a*c |     |       | p1*p2 |       |
+| stage 3 |     |     | a*b | a*c |       |       | p1*p2 |
+*** Instruction performance
+|          | latency(how long) | cycles/issue | Capacity | Throughput bound (cpi/capacity) |
+|----------+-------------------+--------------+----------+---------------------------------|
+| load     |                 3 |            1 |        2 |                              .5 |
+| store    |                 4 |            1 |        1 |                               1 |
+| int add  |                 1 |            1 |        4 |                             .25 |
+| int mult |                 3 |            1 |        1 |                               1 |
+| int div  |              3-30 |         3-30 |        1 |                            3-30 |
+| FP add   |                 3 |            1 |        1 |                               1 |
+| FP mul   |                 5 |            1 |        2 |                              .5 |
+| FP div   |              3-15 |         3-15 |        1 |                            3-15 |
+|          |                   |              |          |                                 |
+*** Reassociation
+    Change order of operation in loop to promote pipelining independence
+    #+begin_src C
+    /* Unrolled and not reassociated */
+    for (i = 0; i < limit; i+= 2) {
+       acc = (acc OPER d[i]) OPER d[i+1];
+    }
+    /* Unrolled and reassociated */
+    for(i = 0; i < limit; i+=2) {
+       acc = acc OPER (d[i] OPER d[i + 1]);
+    }
+    #+end_src
+    Now acc is no longer waiting for prev_acc as long
+*** Branch Prediciton
+    For a processor to be fully pipelined we must assume where a program
+    will jump. 
+    + Make a good guess by recording previous experience
+    + Perform work in parallel based on prediction
+    + Dont expose that work until the branch is known
+** Class Examples
+*** CPE Example 1
+    #+begin_src C
+    /*
+                    latency    capacity
+     load             4            2
+     store            4            1
+     int +            1            4 
+     int *            3            1
+     FP +             3            1
+     FP *             5            2
+    */
+    int f(int *a, int len) {
+       int i;
+       int r = 0;
+       for (i = 0; i < len; i++) {
+          r = r * a[i] + a[i];
+       }
+       return r
+    }
+    #+end_src
+    #+begin_src C
+/*
+    i = 0                    i=1              i = 2
+   load ---              increment            increment  
+      \     \             \                     \
+       mult  \             load ------|          load------|
+         |-- add------------|-->mult  |     |-----|-->mult |
+                                |---->add---^           |--add
+*/
+    #+end_src 
+    i = 0
+    + load = 4
+    + int * = 3
+    + int + = 1
+    i = 1
+    + increment = 1
+    + load = 4
+    + int * = 3
+    + add = 1
+    i = 2
+    + increment = 1
+    + load = 4
+    + int * = 3
+    + add = 1
+   This would take 4n + 4 would be the most expensive path
+   4n for the iterations, 4 for the load
+*** CPE Example 2
+   #+begin_src C
+    /*
+                    latency    capacity
+     load             4            2
+     store            4            1
+     int +            1            4 
+     int *            3            1
+     FP +             3            1
+     FP *             5            2
+    */
+    int f(int *a, int len) {
+       int i;
+       int sum = 0;
+       int product = 1;
+       for (i = 0; i < len; i++) {
+          prod = prod * a[i];
+          sum = sum + a[i];
+       }
+       return sum + prod;
+    }
+    #+end_src
+    #+begin_src C
+/*
+    i = 0                    i=1              i = 2
+                        add ----------------> add
+                          \                   \
+   load                   load                load
+    \   \                 \    \               \   \
+     \   mult--------------> mult---------------->mult
+      \                    \                    \
+       add------------------> add -------------> add
+*/
+    #+end_src 
+    3n + 4 
+    + 3n from 3 from mult * n elements
+    + 4 from the laod
+*** CPE Example 3
+    CPE Example 2 with doubles as sum and product
+    5n + 4
+    + 5 from FP * for n elements
+    + 4 from the load
+*** CPE Example 4
+       #+begin_src C
+    /*
+                    latency    capacity
+     load             4            2
+     store            4            1
+     int +            1            4 
+     int *            3            1
+     FP +             3            1
+     FP *             5            2
+    */
+    int f(double *a, int len) {
+       int i;
+       double sq_num = 0;
+       for (i = 0; i < len; i++) {
+          sq_num = sq_num + (a[i] (a[i]));
+       }
+       return sq_num;
+    }
+    #+end_src
+    #+begin_src C
+/*
+    i = 0                    i=1              i = 2
+                        add---------------->  add
+                          \                   \
+   load                   load                load
+     \                     \                   \
+      mult                 mult               mult
+        \                   \                   \
+         add--------------->add---------------->add
+*/
+    #+end_src 
+    3n + 9
+    + 3 FP +  each element = 3
+    + Load + FP *  = 9
+*** CPE Example 5
+   #+begin_src C
+    /*
+                    latency    capacity
+     load             4            2
+     store            4            1
+     int +            1            4 
+     int *            3            1
+     FP +             3            1
+     FP *             5            2
+    */
+    int f(int *a, int len) {
+       int i;
+       int double sq_sum = 0; sq_sum2 = 0;
+       for (i = 0; i < len; i+=2) {
+           sq_sum = sq)sum + (a[i] * a[i]);
+           sq_sum2 = sq_sum + (a[i+1] * a[i+1]);
+       }
+       for (; i < len; i++) {
+           sq_sum = sq_sum + (a[i] * a[i]);
+       }
+       return sq_sum * sq_sum2;
+    }
+    #+end_src
+    #+begin_src C
+/*
+  i = 0                    i=1      
+    load   load           load  load
+     |      |              |     |
+     mult   |             mult   |
+     |     mult            |     mult
+     |      |              |      |
+     |     add------------>|----->add
+     add-----------------> add
+*/
+    #+end_src 
+    n/2 iterations
+    with 3 * n/2
+    so our CPE is 1.5
+*** Last Quiz Problem
+    #+begin_src C
+    long iterate(long v, int steps) {
+       while (steps--) {
+          if(v & 0x1) {
+             v = 3 * v + 1;
+          }
+          else {
+             v = v >> 1;
+          }
+       }
+    }
+iterate(1, ....);
+    #+end_src
+ #+begin_src C
+/*
+   v= 1                    v=4           v=2                    v=1
+                          + --------------> + ---------------> +     
+                           
+       *                    
+        \                     
+         + ----------------->  >> ---------> >> -------------> >>
+*/
+
+// *--->+ is lea = 3
+ #+end_src
+  5/3 n = 1.67 CPE
